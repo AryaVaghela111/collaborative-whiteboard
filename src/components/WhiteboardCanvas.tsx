@@ -17,7 +17,11 @@ export type WhiteboardHandle = {
   clear: () => void;
 };
 
+
+
+
 const WhiteboardCanvas = forwardRef<WhiteboardHandle>((_, ref) => {
+  const currentColorRef = useRef<string>('#000000'); // default pen color 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const fabricCanvasRef = useRef<fabric.Canvas | null>(null);
   const historyRef = useRef<fabric.Object[][]>([]);
@@ -46,16 +50,26 @@ const WhiteboardCanvas = forwardRef<WhiteboardHandle>((_, ref) => {
 
   useImperativeHandle(ref, () => ({
     setColor: (color: string) => {
-      const canvas = fabricCanvasRef.current;
-      if (canvas?.isDrawingMode) {
+        const canvas = fabricCanvasRef.current;
+        if (!canvas?.isDrawingMode) return;
+        currentColorRef.current = color; // ✅ Save selected color
         canvas.freeDrawingBrush.color = color;
-      }
     },
     setEraser: () => {
-      fabricCanvasRef.current?.freeDrawingBrush && (fabricCanvasRef.current.freeDrawingBrush.color = '#ffffff');
+        const canvas = fabricCanvasRef.current;
+        if (!canvas) return;
+
+        canvas.isDrawingMode = true;
+        canvas.freeDrawingBrush.color = '#ffffff'; // white color
+        canvas.freeDrawingBrush.width = 30; // ✅ make eraser bigger
     },
     setPen: () => {
-      fabricCanvasRef.current?.freeDrawingBrush && (fabricCanvasRef.current.freeDrawingBrush.color = '#000000');
+        const canvas = fabricCanvasRef.current;
+        if (!canvas) return;
+
+        canvas.isDrawingMode = true;
+        canvas.freeDrawingBrush.color = currentColorRef.current;  // or any current color
+        canvas.freeDrawingBrush.width = 4;          // ✅ Reset to normal pen size
     },
     undo: async () => {
       const canvas = fabricCanvasRef.current;
