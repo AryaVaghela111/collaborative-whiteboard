@@ -33,6 +33,9 @@ const Toolbar = ({ whiteboardRef }: Props) => {
       <button onClick={() => whiteboardRef.current?.undo()}>↩️ Undo</button>
       <button onClick={() => whiteboardRef.current?.redo()}>↪️ Redo</button>
       <button onClick={() => whiteboardRef.current?.clear()}>🗑️ Clear</button>
+      <button onClick={() => whiteboardRef.current?.addRect()}>⬛ Square</button>
+      <button onClick={() => whiteboardRef.current?.addCircle()}>⚪ Circle</button>
+      <button onClick={() => whiteboardRef.current?.addText()}>🔤 Text</button>
     </div>
   )
 }

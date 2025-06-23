@@ -15,6 +15,9 @@ export type WhiteboardHandle = {
   undo: () => void;
   redo: () => void;
   clear: () => void;
+  addRect: () => void;
+  addCircle: () => void;
+  addText: () => void;
 };
 
 
@@ -113,7 +116,63 @@ const WhiteboardCanvas = forwardRef<WhiteboardHandle>((_, ref) => {
       canvas.clear().renderAll();
       canvas.backgroundColor = '#ffffff';
       await saveHistory();
-    }
+    },
+    addRect: () => {
+    const canvas = fabricCanvasRef.current;
+    if (!canvas) return;
+
+    const rect = new fabric.Rect({
+        left: 100,
+        top: 100,
+        fill: '#ffffff',
+        width: 100,
+        height: 100,
+        stroke: '#000',
+        strokeWidth: 2,
+    });
+
+    canvas.add(rect);
+    canvas.setActiveObject(rect);
+    canvas.renderAll();
+    saveHistory(); 
+    },
+
+    addCircle: () => {
+    const canvas = fabricCanvasRef.current;
+    if (!canvas) return;
+
+    const circle = new fabric.Circle({
+        left: 150,
+        top: 150,
+        fill: '#ffffff',
+        radius: 50,
+        stroke: '#000',
+        strokeWidth: 2,
+    });
+
+    canvas.add(circle);
+    canvas.setActiveObject(circle);
+    canvas.renderAll();
+    saveHistory(); 
+    },
+
+    addText: () => {
+    const canvas = fabricCanvasRef.current;
+    if (!canvas) return;
+
+    const text = new fabric.IText('Enter text', {
+        left: 200,
+        top: 200,
+        fontSize: 24,
+        fill: currentColorRef.current,
+    });
+
+    canvas.add(text);
+    canvas.setActiveObject(text);
+    canvas.renderAll();
+    saveHistory(); 
+    },
+
   }));
 
   useEffect(() => {
