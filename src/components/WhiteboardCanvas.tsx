@@ -18,6 +18,7 @@ export type WhiteboardHandle = {
   addRect: () => void;
   addCircle: () => void;
   addText: () => void;
+  toggleSelectMode: (enabled: boolean) => void;
 };
 
 
@@ -129,6 +130,9 @@ const WhiteboardCanvas = forwardRef<WhiteboardHandle>((_, ref) => {
         height: 100,
         stroke: '#000',
         strokeWidth: 2,
+        selectable: true,    // can be selected
+        hasControls: true,   // shows resize handles
+        lockScalingFlip: true,
     });
 
     canvas.add(rect);
@@ -172,6 +176,21 @@ const WhiteboardCanvas = forwardRef<WhiteboardHandle>((_, ref) => {
     canvas.renderAll();
     saveHistory(); 
     },
+    toggleSelectMode: (enabled: boolean) => {
+    const canvas = fabricCanvasRef.current;
+    if (!canvas) return;
+
+    canvas.isDrawingMode = !enabled;
+    canvas.selection = enabled;
+
+    canvas.getObjects().forEach(obj => {
+        obj.selectable = enabled;
+        obj.evented = enabled;
+        obj.hasControls = enabled;
+    });
+
+    canvas.renderAll();
+    }
 
   }));
 
@@ -180,7 +199,8 @@ const WhiteboardCanvas = forwardRef<WhiteboardHandle>((_, ref) => {
 
     const canvas = new fabric.Canvas(canvasRef.current, {
       isDrawingMode: true,
-      backgroundColor: '#ffffff'
+      backgroundColor: '#ffffff',
+      selection: true,
     });
 
     canvas.setHeight(window.innerHeight);

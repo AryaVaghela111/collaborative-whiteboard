@@ -36,6 +36,8 @@ const Toolbar = ({ whiteboardRef }: Props) => {
       <button onClick={() => whiteboardRef.current?.addRect()}>⬛ Square</button>
       <button onClick={() => whiteboardRef.current?.addCircle()}>⚪ Circle</button>
       <button onClick={() => whiteboardRef.current?.addText()}>🔤 Text</button>
+      <button onClick={() => whiteboardRef.current?.toggleSelectMode(true)}>🖱️ Select</button>
+      <button onClick={() => whiteboardRef.current?.toggleSelectMode(false)}>✏️ Draw</button>
     </div>
   )
 }
