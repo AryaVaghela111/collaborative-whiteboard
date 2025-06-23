@@ -7,6 +7,7 @@ import {
   forwardRef
 } from 'react';
 import { fabric } from 'fabric';
+import socket from '@/lib/socket';
 
 export type WhiteboardHandle = {
   setColor: (color: string) => void;
@@ -216,11 +217,32 @@ const WhiteboardCanvas = forwardRef<WhiteboardHandle>((_, ref) => {
 
     fabricCanvasRef.current = canvas;
 
-    canvas.on('path:created', () => {
-      saveHistory();
+    canvas.on('path:created', (event) => {
+        const path = (event as unknown as { path: fabric.Path }).path;
+        if (path) {
+            const pathData = path.toObject();
+            socket.emit('canvas:update', pathData);
+            saveHistory();
+        }
+        });
+
+        socket.on('canvas:update', (data: any) => {
+        const canvas = fabricCanvasRef.current;
+        if (!canvas) return;
+
+        fabric.util.enlivenObjects(
+            [data],
+            (objects: fabric.Object[]) => {
+            objects.forEach((obj) => canvas.add(obj));
+            canvas.renderAll();
+            },
+            'fabric'
+        );
     });
 
+
     return () => {
+      socket.off('canvas:update');
       canvas.dispose();
     };
   }, []);
