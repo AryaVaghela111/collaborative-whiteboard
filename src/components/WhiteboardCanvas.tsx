@@ -161,20 +161,28 @@ const WhiteboardCanvas = forwardRef<WhiteboardHandle>((_, ref) => {
     },
 
     addText: () => {
-    const canvas = fabricCanvasRef.current;
-    if (!canvas) return;
+        const canvas = fabricCanvasRef.current;
+        if (!canvas) return;
 
-    const text = new fabric.IText('Enter text', {
-        left: 200,
-        top: 200,
-        fontSize: 24,
-        fill: currentColorRef.current,
-    });
+        const text = new fabric.IText('Enter text', {
+            left: 200,
+            top: 200,
+            fontSize: 24,
+            fill: currentColorRef.current,
+            editable: true,
+            hasControls: true,
+            selectable: true,
+        });
 
-    canvas.add(text);
-    canvas.setActiveObject(text);
-    canvas.renderAll();
-    saveHistory(); 
+        canvas.add(text);
+        canvas.setActiveObject(text);
+        canvas.renderAll();
+
+        // ✅ Start editing immediately
+        text.enterEditing();
+        text.selectAll();
+
+        saveHistory(); // if you want undo/redo support
     },
     toggleSelectMode: (enabled: boolean) => {
     const canvas = fabricCanvasRef.current;
