@@ -141,4 +141,6 @@ const WhiteboardCanvas = forwardRef<WhiteboardHandle>((_, ref) => {
   return <canvas ref={canvasRef} />;
 });
 
+WhiteboardCanvas.displayName = 'WhiteboardCanvas';
+
 export default WhiteboardCanvas;
