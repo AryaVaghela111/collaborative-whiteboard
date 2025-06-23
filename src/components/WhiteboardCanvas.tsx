@@ -259,7 +259,7 @@ const WhiteboardCanvas = forwardRef<WhiteboardHandle>((_, ref) => {
       }
     });
 
-    socket.on('canvas:update', (data: any) => {
+    socket.on('canvas:update', (data: fabric.Object & { id?: string }) => {
       if (!fabricCanvasRef.current) return;
       const canvas = fabricCanvasRef.current;
 
@@ -268,7 +268,7 @@ const WhiteboardCanvas = forwardRef<WhiteboardHandle>((_, ref) => {
           const id = (obj as fabric.Object & { id?: string }).id;
           if (!id) return;
 
-          const existing = canvas.getObjects().find((o: any) => o.id === id);
+          const existing = canvas.getObjects().find((o: fabric.Object & { id?: string }) => o.id === id);
 
           if (existing) {
             canvas.remove(existing);
