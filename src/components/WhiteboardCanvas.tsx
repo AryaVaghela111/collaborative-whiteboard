@@ -154,7 +154,7 @@ const WhiteboardCanvas = forwardRef<WhiteboardHandle>((_, ref) => {
     const canvas = fabricCanvasRef.current;
     if (!canvas) return;
 
-    const circle = new fabric.Circle({
+    const circle = Object.assign(new fabric.Circle({
         left: 150,
         top: 150,
         fill: '#ffffff',
@@ -162,7 +162,7 @@ const WhiteboardCanvas = forwardRef<WhiteboardHandle>((_, ref) => {
         stroke: '#000',
         strokeWidth: 2,
         
-    });
+    }), { id: uuidv4() });
 
     canvas.add(circle);
     canvas.setActiveObject(circle);
