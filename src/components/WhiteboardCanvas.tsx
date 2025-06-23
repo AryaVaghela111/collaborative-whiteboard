@@ -6,8 +6,15 @@ import {
   useImperativeHandle,
   forwardRef
 } from 'react';
-import { fabric } from 'fabric';
 import socket from '@/lib/socket';
+import { v4 as uuidv4 } from 'uuid';
+import { fabric } from 'fabric';
+
+declare module 'fabric' {
+  interface Object {
+    id?: string;
+  }
+}
 
 export type WhiteboardHandle = {
   setColor: (color: string) => void;
@@ -21,7 +28,6 @@ export type WhiteboardHandle = {
   addText: () => void;
   toggleSelectMode: (enabled: boolean) => void;
 };
-
 
 
 
@@ -134,12 +140,14 @@ const WhiteboardCanvas = forwardRef<WhiteboardHandle>((_, ref) => {
         selectable: true,    // can be selected
         hasControls: true,   // shows resize handles
         lockScalingFlip: true,
-    });
+    }) as fabric.Object & { id: string };
 
     canvas.add(rect);
+    rect.id = uuidv4(); 
     canvas.setActiveObject(rect);
     canvas.renderAll();
     saveHistory(); 
+    socket.emit('canvas:update', rect.toObject());
     },
 
     addCircle: () => {
@@ -153,12 +161,14 @@ const WhiteboardCanvas = forwardRef<WhiteboardHandle>((_, ref) => {
         radius: 50,
         stroke: '#000',
         strokeWidth: 2,
+        
     });
 
     canvas.add(circle);
     canvas.setActiveObject(circle);
     canvas.renderAll();
     saveHistory(); 
+    socket.emit('canvas:update', circle.toObject());
     },
 
     addText: () => {
@@ -176,12 +186,14 @@ const WhiteboardCanvas = forwardRef<WhiteboardHandle>((_, ref) => {
         });
 
         canvas.add(text);
+        
         canvas.setActiveObject(text);
         canvas.renderAll();
 
         // ✅ Start editing immediately
         text.enterEditing();
         text.selectAll();
+        socket.emit('canvas:update', text.toObject());
 
         saveHistory(); // if you want undo/redo support
     },
@@ -218,28 +230,54 @@ const WhiteboardCanvas = forwardRef<WhiteboardHandle>((_, ref) => {
     fabricCanvasRef.current = canvas;
 
     canvas.on('path:created', (event) => {
-        const path = (event as unknown as { path: fabric.Path }).path;
-        if (path) {
-            const pathData = path.toObject();
-            socket.emit('canvas:update', pathData);
-            saveHistory();
+      const path = (event as unknown as { path: fabric.Path }).path;
+      if (path) {
+        if (!(path as any).id) {
+          (path as any).id = uuidv4();
         }
-        });
-
-        socket.on('canvas:update', (data: any) => {
-        const canvas = fabricCanvasRef.current;
-        if (!canvas) return;
-
-        fabric.util.enlivenObjects(
-            [data],
-            (objects: fabric.Object[]) => {
-            objects.forEach((obj) => canvas.add(obj));
-            canvas.renderAll();
-            },
-            'fabric'
-        );
+        const pathData = path.toObject(['id']);
+        socket.emit('canvas:update', pathData);
+        saveHistory();
+      }
     });
 
+    canvas.on('object:modified', (event) => {
+      const obj = event.target as fabric.Object & { id?: string };
+      if (!obj?.id) return;
+      const data = obj.toObject(['id']);
+      socket.emit('canvas:update', data);
+    });
+
+    canvas.on('text:editing:exited', (e) => {
+      const target = e.target as fabric.Textbox & { id?: string };
+      if (target) {
+        if (!target.id) {
+          target.id = uuidv4();
+        }
+        socket.emit('canvas:update', target.toObject(['id']));
+      }
+    });
+
+    socket.on('canvas:update', (data: any) => {
+      if (!fabricCanvasRef.current) return;
+      const canvas = fabricCanvasRef.current;
+
+      fabric.util.enlivenObjects([data], (objects: fabric.Object[]) => {
+        objects.forEach((obj) => {
+          const id = (obj as any).id;
+          if (!id) return;
+
+          const existing = canvas.getObjects().find((o: any) => o.id === id);
+
+          if (existing) {
+            canvas.remove(existing);
+          }
+
+          canvas.add(obj);
+        });
+        canvas.renderAll();
+      }, 'fabric');
+    });
 
     return () => {
       socket.off('canvas:update');
@@ -253,3 +291,5 @@ const WhiteboardCanvas = forwardRef<WhiteboardHandle>((_, ref) => {
 WhiteboardCanvas.displayName = 'WhiteboardCanvas';
 
 export default WhiteboardCanvas;
+
+
