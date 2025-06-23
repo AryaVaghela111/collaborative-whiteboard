@@ -232,8 +232,9 @@ const WhiteboardCanvas = forwardRef<WhiteboardHandle>((_, ref) => {
     canvas.on('path:created', (event) => {
       const path = (event as unknown as { path: fabric.Path }).path;
       if (path) {
-        if (!(path as any).id) {
-          (path as any).id = uuidv4();
+        const typedPath = path as fabric.Path & { id?: string };
+        if (!typedPath.id) {
+        typedPath.id = uuidv4();
         }
         const pathData = path.toObject(['id']);
         socket.emit('canvas:update', pathData);
@@ -264,7 +265,7 @@ const WhiteboardCanvas = forwardRef<WhiteboardHandle>((_, ref) => {
 
       fabric.util.enlivenObjects([data], (objects: fabric.Object[]) => {
         objects.forEach((obj) => {
-          const id = (obj as any).id;
+          const id = (obj as fabric.Object & { id?: string }).id;
           if (!id) return;
 
           const existing = canvas.getObjects().find((o: any) => o.id === id);
