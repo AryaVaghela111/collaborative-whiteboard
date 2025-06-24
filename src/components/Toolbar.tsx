@@ -50,24 +50,29 @@ const Toolbar = ({ whiteboardRef }: Props) => {
         zIndex: 1000,
       }}
     >
-      <button onClick={() => whiteboardRef.current?.setPen()}>🖊️ Pen</button>
-      <button onClick={() => whiteboardRef.current?.setEraser()}>🩹 Eraser</button>
       <input
+        style={{
+          padding: '1px 1px',
+          border: '1px solid #ccc',
+          cursor: 'pointer'
+        }}
         ref={colorInputRef}
         type="color"
         defaultValue="#000000"
         onChange={(e) => whiteboardRef.current?.setColor(e.target.value)}
       />
-      <button onClick={() => whiteboardRef.current?.undo()}>↩️ Undo</button>
-      <button onClick={() => whiteboardRef.current?.redo()}>↪️ Redo</button>
-      <button onClick={() => whiteboardRef.current?.clear()}>🗑️ Clear</button>
-      <button onClick={() => whiteboardRef.current?.addRect()}>⬛ Square</button>
-      <button onClick={() => whiteboardRef.current?.addCircle()}>⚪ Circle</button>
-      <button onClick={() => whiteboardRef.current?.addText()}>🔤 Text</button>
-      <button onClick={() => whiteboardRef.current?.toggleSelectMode(true)}>🖱️ Select</button>
-      <button onClick={() => whiteboardRef.current?.toggleSelectMode(false)}>✏️ Draw</button>
-      <button onClick={handleDownloadImage}>Export as Image</button>
-      <button onClick={handleDownloadPDF}>Export as PDF</button>
+      <button className='toolbar-button' onClick={() => whiteboardRef.current?.setPen()}>🖊️ Pen</button>
+      <button className='toolbar-button' onClick={() => whiteboardRef.current?.setEraser()}>🩹 Eraser</button>
+      <button className='toolbar-button' onClick={() => whiteboardRef.current?.undo()}>↩️ Undo</button>
+      <button className='toolbar-button' onClick={() => whiteboardRef.current?.redo()}>↪️ Redo</button>
+      <button className='toolbar-button' onClick={() => whiteboardRef.current?.clear()}>🗑️ Clear</button>
+      <button className='toolbar-button' onClick={() => whiteboardRef.current?.addRect()}>⬛ Square</button>
+      <button className='toolbar-button' onClick={() => whiteboardRef.current?.addCircle()}>⚪ Circle</button>
+      <button className='toolbar-button' onClick={() => whiteboardRef.current?.addText()}>🔤 Text</button>
+      <button className='toolbar-button' onClick={() => whiteboardRef.current?.toggleSelectMode(true)}>🖱️ Select</button>
+      <button className='toolbar-button' onClick={() => whiteboardRef.current?.toggleSelectMode(false)}>✏️ Draw</button>
+      <button className='toolbar-button' onClick={handleDownloadImage}>Export as Image</button>
+      <button className='toolbar-button' onClick={handleDownloadPDF}>Export as PDF</button>
     </div>
   )
 }
