@@ -26,29 +26,32 @@ const start = async () => {
   })
 
   io.on('connection', (socket) => {
-  console.log('✅ User connected:', socket.id);
+    console.log('✅ User connected:', socket.id)
 
-  socket.on('join-room', (roomId: string) => {
-    socket.join(roomId);
-    console.log(`📌 Socket ${socket.id} joined room ${roomId}`);
-  });
+    socket.on('join-room', (roomId: string) => {
+      socket.join(roomId)
+      console.log(`📌 Socket ${socket.id} joined room ${roomId}`)
+    })
 
-  socket.on('canvas:update', ({ roomId, data }) => {
-    socket.to(roomId).emit('canvas:update', data); // send only to others in the room
-  });
+    socket.on('canvas:update', ({ roomId, data }) => {
+      socket.to(roomId).emit('canvas:update', data)
+    })
 
-  socket.on('disconnect', () => {
-    console.log('❌ User disconnected:', socket.id);
-  });
-});
-
+    socket.on('disconnect', () => {
+      console.log('❌ User disconnected:', socket.id)
+    })
+  })
 
   fastify.get('/', async () => {
     return { status: 'Socket.io + Fastify server running ✅' }
   })
 
-  httpServer.listen(3001, () => {
-    console.log('✅ Fastify + Socket.io server running on http://localhost:3001')
+  // ✅ Use PORT and host 0.0.0.0 for Railway compatibility
+  const port = parseInt(process.env.PORT || '3001')
+  const host = '0.0.0.0'
+
+  httpServer.listen(port, host, () => {
+    console.log(`✅ Fastify + Socket.io server running on http://${host}:${port}`)
   })
 }
 
