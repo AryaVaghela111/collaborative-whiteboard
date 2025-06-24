@@ -1,58 +1,59 @@
-import Fastify from 'fastify'
-import fastifyCors from '@fastify/cors'
-import { Server } from 'socket.io'
-import { createServer } from 'http'
-import dotenv from 'dotenv'
-import { connectToMongo } from './db'
-import { roomRoutes } from './routes/room'
+import Fastify from 'fastify';
+import fastifyCors from '@fastify/cors';
+import { Server as SocketIOServer } from 'socket.io';
+import dotenv from 'dotenv';
+import { connectToMongo } from './db';
+import { roomRoutes } from './routes/room';
 
-dotenv.config({ path: './.env' })
+dotenv.config({ path: './.env' });
 
 const start = async () => {
-  await connectToMongo()
+  await connectToMongo();
 
-  const fastify = Fastify()
+  const fastify = Fastify();
 
   await fastify.register(fastifyCors, {
-    origin: '*',
-  })
+    origin: true,
+    credentials: true,
+  });
 
-  await fastify.register(roomRoutes)
-
-  const httpServer = createServer(fastify.server)
-
-  const io = new Server(httpServer, {
-    cors: { origin: '*' },
-  })
-
-  io.on('connection', (socket) => {
-    console.log('✅ User connected:', socket.id)
-
-    socket.on('join-room', (roomId: string) => {
-      socket.join(roomId)
-      console.log(`📌 Socket ${socket.id} joined room ${roomId}`)
-    })
-
-    socket.on('canvas:update', ({ roomId, data }) => {
-      socket.to(roomId).emit('canvas:update', data)
-    })
-
-    socket.on('disconnect', () => {
-      console.log('❌ User disconnected:', socket.id)
-    })
-  })
+  await fastify.register(roomRoutes);
 
   fastify.get('/', async () => {
-     console.log('✅ GET / called');
-    return { status: 'Socket.io + Fastify server running ✅' }
-  })
+    console.log('✅ GET / called');
+    return { status: 'Socket.io + Fastify server running ✅' };
+  });
 
-  // ✅ Use PORT and host 0.0.0.0 for Railway compatibility
-  const port = parseInt(process.env.PORT || '3001')
-  const host = '0.0.0.0'
+  const port = parseInt(process.env.PORT || '3001');
+  const host = '0.0.0.0';
 
-  await httpServer.listen(port, host);
-  console.log(`✅ Fastify + Socket.io server running on http://${host}:${port}`);
-}
+  const io = new SocketIOServer(fastify.server, {
+    cors: {
+      origin: '*', // or replace with Vercel domain
+      methods: ['GET', 'POST'],
+    },
+  });
 
-start()
+  io.on('connection', (socket) => {
+    console.log('✅ User connected:', socket.id);
+
+    socket.on('join-room', (roomId: string) => {
+      socket.join(roomId);
+      console.log(`📌 Socket ${socket.id} joined room ${roomId}`);
+    });
+
+    socket.on('canvas:update', ({ roomId, data }) => {
+      socket.to(roomId).emit('canvas:update', data);
+    });
+
+    socket.on('disconnect', () => {
+      console.log('❌ User disconnected:', socket.id);
+    });
+  });
+
+  // ✅ Use Fastify's native listen()
+  await fastify.listen({ port, host });
+  console.log(`✅ Server listening at http://${host}:${port}`);
+};
+
+start();
