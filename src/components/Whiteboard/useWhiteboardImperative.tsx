@@ -12,25 +12,29 @@ export function useWhiteboardImperativeHandle(
   currentColorRef: React.MutableRefObject<string>
 ) {
   const saveHistory = async () => {
-    const canvas = fabricCanvasRef.current;
-    if (!canvas) return;
+  const canvas = fabricCanvasRef.current;
+  if (!canvas) return;
 
-    if (stepRef.current < historyRef.current.length - 1) {
-      historyRef.current.splice(stepRef.current + 1);
-    }
+  // 🧼 Remove redo steps if any (after undo)
+  if (stepRef.current < historyRef.current.length - 1) {
+    historyRef.current = historyRef.current.slice(0, stepRef.current + 1);
+  }
 
-    const clones = await Promise.all(
-      canvas.getObjects().map(
-        obj =>
-          new Promise<fabric.Object>(resolve => {
-            obj.clone((clone: fabric.Object) => resolve(clone));
-          })
-      )
-    );
+  // ✅ Clone all canvas objects deeply
+  const clones = await Promise.all(
+    canvas.getObjects().map(
+      obj =>
+        new Promise<fabric.Object>(resolve => {
+          obj.clone((clone: fabric.Object) => resolve(clone));
+        })
+    )
+  );
 
-    historyRef.current.push(clones);
-    stepRef.current++;
-  };
+  historyRef.current.push(clones);
+  stepRef.current++;
+};
+
+    
 
   useImperativeHandle(ref, () => ({
     setColor: (color: string) => {
