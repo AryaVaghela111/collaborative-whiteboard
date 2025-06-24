@@ -1,36 +1,88 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🧑‍🎨 Collaborative Whiteboard
 
-## Getting Started
+A real-time collaborative whiteboard web application that allows multiple users to draw, write, and interact simultaneously — replicating the experience of a physical whiteboard online.
 
-First, run the development server:
+---
 
-```bash
+## 🌐 Live Demo
+
+🔗 [Try the Whiteboard](https://collaborative-whiteboard-gamma.vercel.app/room/demo123)
+
+---
+
+## 📌 Features
+
+- ✏️ **Drawing Tools**: Pen, Eraser, Rectangle, Circle, Text, Color Picker
+- 🔁 **Canvas Management**: Undo, Redo, Clear
+- 🔄 **Real-Time Sync**: WebSocket-powered updates across users
+- 👥 **Multi-User Collaboration**: Shareable room URLs for live editing
+- 🔐 **Access Control**: Public or private rooms with view-only/edit permissions (`?mode=view`)
+- 💾 **Save & Export**: Export canvas as PNG or PDF
+- ✅ **Persistent Canvas**: Automatically saves canvas to the backend (MongoDB)
+
+---
+
+## 🧰 Tech Stack
+
+### Frontend
+- **Next.js** (React)
+- **Fabric.js** (Canvas library)
+- **Socket.IO-client**
+
+### Backend
+- **Fastify**
+- **Socket.IO**
+- **MongoDB** with **Mongoose**
+
+### Hosting
+- **Frontend**: [Vercel](https://vercel.com/)
+- **Backend**: [Railway](https://railway.app/)
+
+---
+
+## 🚀 Getting Started
+
+### 🔧 Local Setup
+
+#### 1. Clone the Repository
+git clone https://github.com/your-username/collaborative-whiteboard.git
+cd collaborative-whiteboard
+
+### Frontend Setup
+
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000/room/demo123 in your browser
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Backend Setup
+cd backend
+npm install
+npm run dev
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+## Usage Guide
 
-To learn more about Next.js, take a look at the following resources:
+Open any URL like:
+https://collaborative-whiteboard-gamma.vercel.app/room/myroom123
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+To make a view-only link, append ?mode=view:
+https://collaborative-whiteboard-gamma.vercel.app/room/myroom123?mode=view
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Tools:
+Pen & Color Picker
+Eraser
+Shapes: Rectangle, Circle
+Text Tool
+Undo / Redo / Clear
+Export as PNG or PDF
 
-## Deploy on Vercel
+## Author
+Arya Vaghela
+aryavaghela111@gmail.com
+IIT Roorkee
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License
+MIT License — Feel free to use, modify, and contribute!
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
