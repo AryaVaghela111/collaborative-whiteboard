@@ -45,7 +45,7 @@ A real-time collaborative whiteboard web application that allows multiple users 
 ### 🔧 Local Setup
 
 #### 1. Clone the Repository
-git clone https://github.com/your-username/collaborative-whiteboard.git
+git clone https://github.com/AryaVaghela111/collaborative-whiteboard.git
 cd collaborative-whiteboard
 
 ### Frontend Setup
