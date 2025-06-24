@@ -6,20 +6,31 @@ import socket from '@/lib/socket';
 export function useWhiteboardEffect(
   canvasRef: React.MutableRefObject<HTMLCanvasElement | null>,
   fabricCanvasRef: React.MutableRefObject<fabric.Canvas | null>,
-  roomId: string | null
+  roomId: string | null,
+  mode: 'edit' | 'view' = 'edit'
 ) {
   useEffect(() => {
     if (!canvasRef.current) return;
 
     const canvas = new fabric.Canvas(canvasRef.current, {
-      isDrawingMode: true,
-      backgroundColor: '#ffffff',
-      selection: true,
+        isDrawingMode: true,
+        backgroundColor: '#ffffff',
+        selection: true,
     });
-
+    
     canvas.setHeight(window.innerHeight);
     canvas.setWidth(window.innerWidth);
     fabricCanvasRef.current = canvas;
+
+    const isViewOnly = mode === 'view';
+    canvas.isDrawingMode = !isViewOnly;
+    canvas.selection = !isViewOnly;
+
+    canvas.getObjects().forEach(obj => {
+    obj.selectable = !isViewOnly;
+    obj.evented = !isViewOnly;
+    obj.hasControls = !isViewOnly;
+    });
 
     if (roomId) {
       socket.emit('join-room', roomId);
@@ -37,6 +48,7 @@ export function useWhiteboardEffect(
     }
 
     canvas.on('path:created', (event) => {
+      if (isViewOnly) return;
       const path = (event as unknown as { path: fabric.Path }).path;
       if (path) {
         const typedPath = path as fabric.Path & { id?: string };
@@ -49,6 +61,7 @@ export function useWhiteboardEffect(
     });
 
     canvas.on('object:modified', (event) => {
+      if (isViewOnly) return;
       const obj = event.target as fabric.Object & { id?: string };
       if (!obj?.id) return;
       const data = obj.toObject(['id']);
@@ -56,6 +69,7 @@ export function useWhiteboardEffect(
     });
 
     canvas.on('text:editing:exited', (e) => {
+      if (isViewOnly) return;
       const target = e.target as fabric.Textbox & { id?: string };
       if (target) {
         if (!target.id) {

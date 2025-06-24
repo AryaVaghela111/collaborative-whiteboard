@@ -36,9 +36,11 @@ const WhiteboardCanvas = forwardRef<WhiteboardHandle>((_, ref) => {
   const currentColorRef = useRef<string>('#000000');
 
   const roomId = window.location.pathname.split('/').pop() || null;
+  const searchParams = new URLSearchParams(window.location.search)
+  const mode = searchParams.get('mode') === 'view' ? 'view' : 'edit'
 
   useWhiteboardImperativeHandle(ref, fabricCanvasRef, historyRef, stepRef, currentColorRef);
-  useWhiteboardEffect(canvasRef, fabricCanvasRef, roomId);
+  useWhiteboardEffect(canvasRef, fabricCanvasRef, roomId, mode);
 
   return <canvas ref={canvasRef} />;
 });
