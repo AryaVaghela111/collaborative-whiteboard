@@ -13,7 +13,7 @@ const start = async () => {
   const fastify = Fastify();
 
   await fastify.register(fastifyCors, {
-    origin: true,
+    origin: ['https://collaborative-whiteboard-gamma.vercel.app/'],
     credentials: true,
   });
 
@@ -29,7 +29,7 @@ const start = async () => {
 
   const io = new SocketIOServer(fastify.server, {
     cors: {
-      origin: '*', // or replace with Vercel domain
+      origin: ['https://collaborative-whiteboard-gamma.vercel.app/'], // or replace with Vercel domain
       methods: ['GET', 'POST'],
     },
   });

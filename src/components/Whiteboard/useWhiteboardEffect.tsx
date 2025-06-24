@@ -3,6 +3,8 @@ import { fabric } from 'fabric';
 import { v4 as uuidv4 } from 'uuid';
 import socket from '@/lib/socket';
 
+
+
 export function useWhiteboardEffect(
   canvasRef: React.MutableRefObject<HTMLCanvasElement | null>,
   fabricCanvasRef: React.MutableRefObject<fabric.Canvas | null>,
@@ -32,9 +34,11 @@ export function useWhiteboardEffect(
     obj.hasControls = !isViewOnly;
     });
 
+    const BACKEND_URL = 'https://collaborative-whiteboard-production-0ace.up.railway.app';
+
     if (roomId) {
       socket.emit('join-room', roomId);
-      fetch(`http://localhost:3001/room/${roomId}`)
+      fetch(`${BACKEND_URL}/room/${roomId}`)
         .then(res => res.json())
         .then(data => {
           if (data.canvasData && Object.keys(data.canvasData).length > 0) {
