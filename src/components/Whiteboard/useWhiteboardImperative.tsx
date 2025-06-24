@@ -62,7 +62,9 @@ export function useWhiteboardImperativeHandle(
       if (!canvas || stepRef.current <= 0) return;
 
       stepRef.current--;
-      canvas.clear().renderAll();
+      canvas.clear();
+      canvas.backgroundColor = '#ffffff';
+      canvas.renderAll();
 
       const clones = await Promise.all(
         historyRef.current[stepRef.current].map(
@@ -80,7 +82,9 @@ export function useWhiteboardImperativeHandle(
       if (!canvas || stepRef.current >= historyRef.current.length - 1) return;
 
       stepRef.current++;
-      canvas.clear().renderAll();
+      canvas.clear();
+      canvas.backgroundColor = '#ffffff';
+      canvas.renderAll();
 
       const clones = await Promise.all(
         historyRef.current[stepRef.current].map(
@@ -96,8 +100,9 @@ export function useWhiteboardImperativeHandle(
     clear: async () => {
       const canvas = fabricCanvasRef.current;
       if (!canvas) return;
-      canvas.clear().renderAll();
+      canvas.clear();
       canvas.backgroundColor = '#ffffff';
+      canvas.renderAll();
       await saveHistory();
     },
     addRect: () => {
