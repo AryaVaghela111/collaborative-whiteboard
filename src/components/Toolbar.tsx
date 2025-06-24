@@ -2,10 +2,38 @@
 
 import { WhiteboardHandle } from './WhiteboardCanvas'
 import { useRef } from 'react'
+import { jsPDF } from 'jspdf';
 
 type Props = {
   whiteboardRef: React.RefObject<WhiteboardHandle | null> ;
 }
+
+const handleDownloadImage = () => {
+  const canvasEl = document.querySelector('canvas') as HTMLCanvasElement;
+  if (!canvasEl) return;
+
+  const image = canvasEl.toDataURL('image/png');
+  const link = document.createElement('a');
+  link.download = 'whiteboard.png';
+  link.href = image;
+  link.click();
+};
+
+const handleDownloadPDF = () => {
+  const canvasEl = document.querySelector('canvas') as HTMLCanvasElement;
+  if (!canvasEl) return;
+
+  const image = canvasEl.toDataURL('image/png');
+
+  const pdf = new jsPDF({
+    orientation: 'landscape',
+    unit: 'px',
+    format: [canvasEl.width, canvasEl.height],
+  });
+
+  pdf.addImage(image, 'PNG', 0, 0, canvasEl.width, canvasEl.height);
+  pdf.save('whiteboard.pdf');
+};
 
 const Toolbar = ({ whiteboardRef }: Props) => {
   const colorInputRef = useRef<HTMLInputElement | null>(null)
@@ -38,6 +66,8 @@ const Toolbar = ({ whiteboardRef }: Props) => {
       <button onClick={() => whiteboardRef.current?.addText()}>🔤 Text</button>
       <button onClick={() => whiteboardRef.current?.toggleSelectMode(true)}>🖱️ Select</button>
       <button onClick={() => whiteboardRef.current?.toggleSelectMode(false)}>✏️ Draw</button>
+      <button onClick={handleDownloadImage}>Export as Image</button>
+      <button onClick={handleDownloadPDF}>Export as PDF</button>
     </div>
   )
 }
