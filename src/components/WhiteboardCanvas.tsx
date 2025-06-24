@@ -9,6 +9,7 @@ import {
 import socket from '@/lib/socket';
 import { v4 as uuidv4 } from 'uuid';
 import { fabric } from 'fabric';
+import { usePathname } from 'next/navigation'
 
 declare module 'fabric' {
   interface Object {
@@ -28,7 +29,6 @@ export type WhiteboardHandle = {
   addText: () => void;
   toggleSelectMode: (enabled: boolean) => void;
 };
-
 
 
 const WhiteboardCanvas = forwardRef<WhiteboardHandle>((_, ref) => {
@@ -229,6 +229,26 @@ const WhiteboardCanvas = forwardRef<WhiteboardHandle>((_, ref) => {
 
     fabricCanvasRef.current = canvas;
 
+    const pathname = window.location.pathname;
+  const roomId = pathname?.split('/').pop() || null;
+
+    if (roomId) {
+  socket.emit('join-room', roomId);
+
+  fetch(`http://localhost:3001/room/${roomId}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.canvasData && Object.keys(data.canvasData).length > 0) {
+        canvas.loadFromJSON(data.canvasData, () => {
+          canvas.renderAll();
+          console.log('✅ Canvas loaded from DB for room:', roomId);
+        });
+      }
+    })
+    .catch(err => console.error('❌ Failed to load canvas:', err));
+}
+
+
     canvas.on('path:created', (event) => {
       const path = (event as unknown as { path: fabric.Path }).path;
       if (path) {
@@ -237,7 +257,7 @@ const WhiteboardCanvas = forwardRef<WhiteboardHandle>((_, ref) => {
         typedPath.id = uuidv4();
         }
         const pathData = path.toObject(['id']);
-        socket.emit('canvas:update', pathData);
+        socket.emit('canvas:update', { roomId, data: pathData });
         saveHistory();
       }
     });
@@ -246,7 +266,7 @@ const WhiteboardCanvas = forwardRef<WhiteboardHandle>((_, ref) => {
       const obj = event.target as fabric.Object & { id?: string };
       if (!obj?.id) return;
       const data = obj.toObject(['id']);
-      socket.emit('canvas:update', data);
+      socket.emit('canvas:update', { roomId, data });
     });
 
     canvas.on('text:editing:exited', (e) => {
@@ -255,7 +275,7 @@ const WhiteboardCanvas = forwardRef<WhiteboardHandle>((_, ref) => {
         if (!target.id) {
           target.id = uuidv4();
         }
-        socket.emit('canvas:update', target.toObject(['id']));
+        socket.emit('canvas:update', { roomId, data: target.toObject(['id']) });
       }
     });
 

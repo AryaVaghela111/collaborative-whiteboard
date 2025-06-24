@@ -26,16 +26,22 @@ const start = async () => {
   })
 
   io.on('connection', (socket) => {
-    console.log('✅ User connected:', socket.id)
+  console.log('✅ User connected:', socket.id);
 
-    socket.on('canvas:update', (data) => {
-      socket.broadcast.emit('canvas:update', data)
-    })
+  socket.on('join-room', (roomId: string) => {
+    socket.join(roomId);
+    console.log(`📌 Socket ${socket.id} joined room ${roomId}`);
+  });
 
-    socket.on('disconnect', () => {
-      console.log('❌ User disconnected:', socket.id)
-    })
-  })
+  socket.on('canvas:update', ({ roomId, data }) => {
+    socket.to(roomId).emit('canvas:update', data); // send only to others in the room
+  });
+
+  socket.on('disconnect', () => {
+    console.log('❌ User disconnected:', socket.id);
+  });
+});
+
 
   fastify.get('/', async () => {
     return { status: 'Socket.io + Fastify server running ✅' }
