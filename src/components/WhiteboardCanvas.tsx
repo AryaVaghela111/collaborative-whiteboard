@@ -9,7 +9,6 @@ import {
 import socket from '@/lib/socket';
 import { v4 as uuidv4 } from 'uuid';
 import { fabric } from 'fabric';
-import { usePathname } from 'next/navigation'
 
 declare module 'fabric' {
   interface Object {
