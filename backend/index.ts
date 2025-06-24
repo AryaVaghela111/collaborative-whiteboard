@@ -43,6 +43,7 @@ const start = async () => {
   })
 
   fastify.get('/', async () => {
+     console.log('✅ GET / called');
     return { status: 'Socket.io + Fastify server running ✅' }
   })
 
@@ -50,9 +51,8 @@ const start = async () => {
   const port = parseInt(process.env.PORT || '3001')
   const host = '0.0.0.0'
 
-  httpServer.listen(port, host, () => {
-    console.log(`✅ Fastify + Socket.io server running on http://${host}:${port}`)
-  })
+  await httpServer.listen(port, host);
+  console.log(`✅ Fastify + Socket.io server running on http://${host}:${port}`);
 }
 
 start()
